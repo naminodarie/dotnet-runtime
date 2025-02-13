@@ -80,18 +80,10 @@ namespace System.Numerics
                 {
                     left = left.Slice(k);
 
-                    if (left.Length < right.Length)
-                    {
-                        Multiply(right,
-                                 left,
-                                 bits.Slice(0, left.Length + right.Length));
-                    }
-                    else
-                    {
-                        Multiply(left,
-                                 right,
-                                 bits.Slice(0, left.Length + right.Length));
-                    }
+                    MultiplySafe(
+                        left,
+                        right,
+                        bits.Slice(0, left.Length + right.Length));
 
                     return ActualLength(bits.Slice(0, left.Length + right.Length));
                 }

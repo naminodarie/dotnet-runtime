@@ -18,24 +18,24 @@ namespace System.Numerics
 
         public static void Divide(ReadOnlySpan<uint> left, uint right, Span<uint> quotient, out uint remainder)
         {
-            InitializeForDebug(quotient);
+            Debug.Assert(quotient.Length == left.Length);
             ulong carry = 0UL;
-            Divide(left, right, quotient, ref carry);
+            left.CopyTo(quotient);
+            DivideSelf(quotient, right, ref carry);
             remainder = (uint)carry;
         }
 
         public static void Divide(ReadOnlySpan<uint> left, uint right, Span<uint> quotient)
         {
-            InitializeForDebug(quotient);
+            Debug.Assert(quotient.Length == left.Length);
             ulong carry = 0UL;
-            Divide(left, right, quotient, ref carry);
+            left.CopyTo(quotient);
+            DivideSelf(quotient, right, ref carry);
         }
 
-        private static void Divide(ReadOnlySpan<uint> left, uint right, Span<uint> quotient, ref ulong carry)
+        private static void DivideSelf(Span<uint> left, uint right, ref ulong carry)
         {
             Debug.Assert(left.Length >= 1);
-            Debug.Assert(quotient.Length == left.Length);
-            InitializeForDebug(quotient);
 
             // Executes the division for one big and one 32-bit integer.
             // Thus, we've similar code than below, but there is no loop for
@@ -45,7 +45,7 @@ namespace System.Numerics
             {
                 ulong value = (carry << 32) | left[i];
                 ulong digit = value / right;
-                quotient[i] = (uint)digit;
+                left[i] = (uint)digit;
                 carry = value - digit * right;
             }
         }
@@ -545,14 +545,15 @@ namespace System.Numerics
                     Debug.Assert(left[^1] < right[0]);
 
                     carry = left[^1];
-                    Divide(left.Slice(0, quotient.Length), right[0], quotient, ref carry);
+                    left.Slice(0, quotient.Length).CopyTo(quotient);
                 }
                 else
                 {
                     carry = 0;
                     quotient.Slice(left.Length).Clear();
-                    Divide(left, right[0], quotient, ref carry);
+                    left.CopyTo(quotient);
                 }
+                DivideSelf(quotient, right[0], ref carry);
 
                 if (remainder.Length != 0)
                 {
@@ -688,10 +689,7 @@ namespace System.Numerics
                 right = TrimEnd(right);
                 bits = bits.Slice(0, left.Length + right.Length);
 
-                if (left.Length < right.Length)
-                    Multiply(right, left, bits);
-                else
-                    Multiply(left, right, bits);
+                MultiplySafe(left, right, bits);
             }
         }
     }
