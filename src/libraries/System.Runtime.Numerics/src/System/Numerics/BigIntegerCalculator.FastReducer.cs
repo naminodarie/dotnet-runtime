@@ -38,7 +38,7 @@ namespace System.Numerics
                 _q1 = q1;
                 _q2 = q2;
 
-                _mu = mu.Slice(0, ActualLength(mu));
+                _mu = TrimEnd(mu);
             }
 
             public int Reduce(Span<uint> value)

@@ -424,9 +424,8 @@ namespace System
                     leading.Clear();
 
                     Recursive(powersOf1e9, maxIndex, base1E9, leading);
-                    leading = leading.Slice(0, BigIntegerCalculator.ActualLength(leading));
 
-                    powersOf1e9.MultiplyPowerOfTen(leading, trailingZeroCount, bits);
+                    powersOf1e9.MultiplyPowerOfTen(BigIntegerCalculator.TrimEnd(leading), trailingZeroCount, bits);
 
                     if (leadingFromPool != null)
                         ArrayPool<uint>.Shared.Return(leadingFromPool);
@@ -445,7 +444,7 @@ namespace System
                 Debug.Assert(bits.Trim(0u).Length == 0);
                 Debug.Assert(BigIntegerParseNaiveThresholdInRecursive > 1);
 
-                base1E9 = base1E9.Slice(0, BigIntegerCalculator.ActualLength(base1E9));
+                base1E9 = BigIntegerCalculator.TrimEnd(base1E9);
                 if (base1E9.Length < BigIntegerParseNaiveThresholdInRecursive)
                 {
                     NaiveBase1E9ToBits(base1E9, bits);
@@ -472,7 +471,7 @@ namespace System
 
                 Recursive(powersOf1e9, powersOf1e9Index - 1, base1E9[multiplier1E9Length..], buffer);
 
-                ReadOnlySpan<uint> buffer2 = buffer.Slice(0, BigIntegerCalculator.ActualLength(buffer));
+                ReadOnlySpan<uint> buffer2 = BigIntegerCalculator.TrimEnd(buffer);
                 Span<uint> bitsUpper = bits.Slice(multiplierTrailingZeroCount, buffer2.Length + multiplier.Length);
                 if (multiplier.Length < buffer2.Length)
                     BigIntegerCalculator.Multiply(buffer2, multiplier, bitsUpper);
@@ -483,7 +482,7 @@ namespace System
 
                 Recursive(powersOf1e9, powersOf1e9Index - 1, base1E9[..multiplier1E9Length], buffer);
 
-                BigIntegerCalculator.AddSelf(bits, buffer.Slice(0, BigIntegerCalculator.ActualLength(buffer)));
+                BigIntegerCalculator.AddSelf(bits, BigIntegerCalculator.TrimEnd(buffer));
 
                 if (bufferFromPool != null)
                     ArrayPool<uint>.Shared.Return(bufferFromPool);

@@ -320,7 +320,7 @@ namespace System.Numerics
                     Debug.Assert(ActualLength(core) <= left.Length + 1);
 
                     // ... and finally merge the result! :-)
-                    AddSelf(bits.Slice(n), core.Slice(0, ActualLength(core)));
+                    AddSelf(bits.Slice(n), TrimEnd(core));
 
                     if (coreFromPool != null)
                         ArrayPool<uint>.Shared.Return(coreFromPool);

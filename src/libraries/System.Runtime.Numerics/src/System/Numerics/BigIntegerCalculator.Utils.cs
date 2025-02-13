@@ -51,6 +51,11 @@ namespace System.Numerics
             return Compare(left, right);
         }
 
+        public static ReadOnlySpan<uint> TrimEnd(ReadOnlySpan<uint> value)
+        {
+            return value.Slice(0, ActualLength(value));
+        }
+
         public static int ActualLength(ReadOnlySpan<uint> value)
         {
             // Since we're reusing memory here, the actual length

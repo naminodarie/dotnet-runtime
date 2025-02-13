@@ -527,7 +527,7 @@ namespace System.Numerics
             Debug.Assert(right[^1] > 0);
             Debug.Assert(right.Length < DivideBurnikelZieglerThreshold);
 
-            left = left.Slice(0, ActualLength(left));
+            left = TrimEnd(left);
 
             if (left.Length < right.Length)
             {
@@ -684,8 +684,8 @@ namespace System.Numerics
             {
                 Debug.Assert(bits.Length == left.Length + right.Length);
 
-                left = left.Slice(0, ActualLength(left));
-                right = right.Slice(0, ActualLength(right));
+                left = TrimEnd(left);
+                right = TrimEnd(right);
                 bits = bits.Slice(0, left.Length + right.Length);
 
                 if (left.Length < right.Length)
