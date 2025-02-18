@@ -87,6 +87,56 @@ namespace System.Numerics
             Debug.Assert(carry == 0);
         }
 
+
+        public static void AddSelf(Span<uint> left, ref int leftSign, ReadOnlySpan<uint> right, int rightSign)
+        {
+            Debug.Assert(left.Length >= right.Length);
+
+            if (rightSign == 0)
+                return;
+            else if (rightSign > 0)
+                AddSelf(left, ref leftSign, right);
+            else
+                SubtractSelf(left, ref leftSign, right);
+        }
+
+        public static void AddSelf(Span<uint> left, ref int leftSign, ReadOnlySpan<uint> right)
+        {
+            Debug.Assert(left.Length >= right.Length);
+
+            if (leftSign == 0)
+            {
+                Debug.Assert(!left.ContainsAnyExcept(0u));
+
+                if (!right.IsEmpty)
+                {
+                    leftSign = 1;
+                    right.CopyTo(left);
+                }
+            }
+            else if (leftSign > 0)
+            {
+                AddSelf(left, right);
+            }
+            else
+            {
+                leftSign = CompareActual(right, left);
+                if (leftSign == 0)
+                {
+                    left.Clear();
+                }
+                else if (leftSign < 0)
+                {
+                    SubtractSelf(left, right);
+                }
+                else
+                {
+                    SubtractSelf(left, right);
+                    NumericsHelpers.DangerousMakeTwosComplement(left);
+                }
+            }
+        }
+
         public static void Subtract(ReadOnlySpan<uint> left, uint right, Span<uint> bits)
         {
             Debug.Assert(left.Length >= 1);
@@ -162,6 +212,53 @@ namespace System.Numerics
 
             // Assertion failing per https://github.com/dotnet/runtime/issues/97780
             //Debug.Assert(carry == 0);
+        }
+
+        public static void SubtractSelf(Span<uint> left, ref int leftSign, ReadOnlySpan<uint> right, int rightSign)
+        {
+            Debug.Assert(left.Length >= right.Length);
+
+            if (rightSign == 0)
+                return;
+            else if (rightSign > 0)
+                SubtractSelf(left, ref leftSign, right);
+            else
+                AddSelf(left, ref leftSign, right);
+        }
+
+        public static void SubtractSelf(Span<uint> left, ref int leftSign, ReadOnlySpan<uint> right)
+        {
+            Debug.Assert(left.Length >= right.Length);
+
+            if (leftSign == 0)
+            {
+                if (!right.IsEmpty)
+                {
+                    leftSign = -1;
+                    right.CopyTo(left);
+                }
+            }
+            else if (leftSign < 0)
+            {
+                AddSelf(left, right);
+            }
+            else
+            {
+                leftSign = CompareActual(left, right);
+                if (leftSign == 0)
+                {
+                    left.Clear();
+                }
+                else if (leftSign > 0)
+                {
+                    SubtractSelf(left, right);
+                }
+                else
+                {
+                    SubtractSelf(left, right);
+                    NumericsHelpers.DangerousMakeTwosComplement(left);
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

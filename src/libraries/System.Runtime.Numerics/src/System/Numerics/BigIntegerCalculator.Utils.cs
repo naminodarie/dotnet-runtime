@@ -51,11 +51,6 @@ namespace System.Numerics
             return Compare(left, right);
         }
 
-        public static ReadOnlySpan<uint> TrimEnd(ReadOnlySpan<uint> value)
-        {
-            return value.Slice(0, ActualLength(value));
-        }
-
         public static int ActualLength(ReadOnlySpan<uint> value)
         {
             // Since we're reusing memory here, the actual length
@@ -66,6 +61,16 @@ namespace System.Numerics
             while (length > 0 && value[length - 1] == 0)
                 --length;
             return length;
+        }
+
+        public static Span<uint> TrimEnd(Span<uint> value)
+        {
+            return value.Slice(0, ActualLength(value));
+        }
+
+        public static ReadOnlySpan<uint> TrimEnd(ReadOnlySpan<uint> value)
+        {
+            return value.Slice(0, ActualLength(value));
         }
 
         private static int Reduce(Span<uint> bits, ReadOnlySpan<uint> modulus)

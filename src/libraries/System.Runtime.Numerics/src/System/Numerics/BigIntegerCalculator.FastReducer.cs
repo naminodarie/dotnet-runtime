@@ -104,12 +104,12 @@ namespace System.Numerics
                     right = right.Slice(0, k);
 
                 SubtractSelf(left, right);
-                left = left.Slice(0, ActualLength(left));
+                left = TrimEnd(left);
 
                 while (Compare(left, modulus) >= 0)
                 {
                     SubtractSelf(left, modulus);
-                    left = left.Slice(0, ActualLength(left));
+                    left = TrimEnd(left);
                 }
 
                 return left.Length;

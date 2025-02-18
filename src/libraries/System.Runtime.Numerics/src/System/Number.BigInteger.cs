@@ -459,6 +459,7 @@ namespace System
                 ReadOnlySpan<uint> multiplier = powersOf1e9.GetSpan(powersOf1e9Index);
                 int multiplierTrailingZeroCount = PowersOf1e9.OmittedLength(powersOf1e9Index);
 
+                Debug.Assert(multiplier[^1] != 0);
                 Debug.Assert(multiplier1E9Length < base1E9.Length && base1E9.Length <= multiplier1E9Length * 2);
 
                 int bufferLength = checked((int)(digitRatio * PowersOf1e9.MaxPartialDigits * multiplier1E9Length) + 1 + 2);

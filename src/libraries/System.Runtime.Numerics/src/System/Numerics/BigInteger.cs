@@ -2723,6 +2723,7 @@ namespace System.Numerics
                 Span<uint> bits = ((uint)size <= BigIntegerCalculator.StackAllocThreshold
                                 ? stackalloc uint[BigIntegerCalculator.StackAllocThreshold]
                                 : bitsFromPool = ArrayPool<uint>.Shared.Rent(size)).Slice(0, size);
+                bits.Clear();
 
                 BigIntegerCalculator.Square(left, bits);
                 result = new BigInteger(bits, (leftSign < 0) ^ (rightSign < 0));
